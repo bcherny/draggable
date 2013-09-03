@@ -1,0 +1,19 @@
+{
+  "name": "draggable.js",
+  "version": "2.0.0",
+  "description": "High performance drag and drop in a tiny package",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "Boris Cherny <bcherny@gmail.com>",
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-uglify": "~0.2.0",
+    "grunt-contrib": "~0.6.1"
+  },
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "dependencies": {
+  }
+}
