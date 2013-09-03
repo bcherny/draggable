@@ -16,12 +16,14 @@ High performance drag and drop in a tiny package
 *Using browser globals:*
 ```js
 var element = document.getElementById('id');
-var options = {};
+var options = {
+	grid: 10,
+	onDrag: function(){ ... }
+};
 new Draggable (element, options);
 ```
 
 *Using AMD/CommonJS:*
-**JavaScript**
 ```js
 var Draggable = require ('Draggable');
 var element = document.getElementById('id');
@@ -36,21 +38,21 @@ new Draggable (element);
 
 | Option 			| Type			| Default			| Description							|
 |-------------------|---------------|-------------------|---------------------------------------|
-| **grid**			| Number		| `0`				| grid cell size for snapping on drag 	|
-| **filterTarget**	| Function(target)		| `null`			| disallow drag when target passes this test |
-| **limit**			| Function(x, y, x0, y0) or Object | '{ x: null, y: null }' | limit x/y drag bounds		|
-| **threshold**		| Number		| `0`				| threshold before drag begins (in px)	|
-| **setCursor**		| Boolean (truthy) | `false`		| change cursor to `move`?				|
-| **setPosition**	| Boolean (truthy) | `true`			| change draggable position to absolute? |
-| **smoothDrag**	| Boolean (truthy) | `true`			| snap to grid only when dropped, not during drag |
+| **grid**			| `Number`		| `0`				| grid size for snapping on drag 	|
+| **filterTarget**	| `Function(target)`	| `null`		| prevent drag when target passes this test |
+| **limit**			| `Function(x, y, x0, y0)` or `Object` | `{ x: null, y: null }` | limit x/y drag bounds		|
+| **threshold**		| `Number`		| `0`				| threshold before drag begins (in px)	|
+| **setCursor**		| `Boolean` (truthy) | `false`		| change cursor to `move`?				|
+| **setPosition**	| `Boolean` (truthy) | `true`			| change draggable position to `absolute`? |
+| **smoothDrag**	| `Boolean` (truthy) | `true`			| snap to grid only when dropped, not during drag |
 
 ## Events
 
-| Event 			| Arguments				|
-|-------------------|-----------------------|
-| onDrag			| element, x, y, event	|
-| onDragStart		| element, X, Y, event	|
-| onDragEnd			| element, X, Y, event	|
+| Event 			| Arguments					|
+|-------------------|---------------------------|
+| onDrag			| `element, x, y, event`	|
+| onDragStart		| `element, x, y, event`	|
+| onDragEnd			| `element, x, y, event`	|
 
 ## Notes
 
