@@ -178,6 +178,8 @@
 
 				var cursor = me.getCursor(e);
 				var threshold = options.threshold;
+				var x = (cursor.x - initialX)/zoom + initialPosition.left;
+				var y = (cursor.y - initialY)/zoom + initialPosition.top;
 
 				// check threshold
 				if (!dragEvent.started && threshold &&
@@ -190,12 +192,14 @@
 				// trigger start event?
 				if (!dragEvent.started) {
 					options.onDragStart(element, initialX, initialY, e);
-					dragEvent.started = true;
+					$.extend(dragEvent, {
+						original: {
+							x: x,
+							y: y
+						},
+						started: true
+					});
 				}
-	 
-				// compute new coordinates
-				var x = (cursor.x - initialX)/zoom + initialPosition.left;
-				var y = (cursor.y - initialY)/zoom + initialPosition.top;
 
 				// move the element
 				if (me.move(x, y)) {
@@ -246,7 +250,7 @@
 
 			} else {
 
-				coords = limit(x,y);
+				coords = limit(x, y, dragEvent.original.x, dragEvent.original.y);
 				if (!coords) return;
 				x = coords[0];
 				y = coords[1];
