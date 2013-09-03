@@ -1,6 +1,6 @@
 #draggable.js
 
-High performance drag and drop in a tiny package
+High performance drag and drop in a tiny (1.6k gzipped) package
 
 ## Usage
 
