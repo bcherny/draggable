@@ -2,14 +2,6 @@ module.exports = (grunt) ->
 
 	grunt.config.init
 
-		# concat:
-		# 	dist:
-		# 		src: [
-		# 			'src/$.js',
-		# 			'src/draggable.js'
-		# 		],
-		# 		dest: 'dist/draggable.min.js'
-
 		uglify:
 			options:
 				mangle:
@@ -22,7 +14,7 @@ module.exports = (grunt) ->
 			standard:
 				files:
 					'dist/draggable.min.js': [
-						'src/$.js',
+						'src/jQueryShim.js',
 						'src/draggable.js'
 					]
 			no$:

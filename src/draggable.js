@@ -3,13 +3,13 @@
         // Node. Does not work with strict CommonJS, but
         // only CommonJS-like enviroments that support module.exports,
         // like Node.
-        module.exports = factory(require('$'));
+        module.exports = factory(require('jQuery'));
     } else if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
-        define(['$'], factory);
+        define(['jQuery'], factory);
     } else {
         // Browser globals (root is window)
-        root.Draggable = factory(root.$);
+        root.Draggable = factory(root.jQuery);
     }
 }(this, function ($) {
 

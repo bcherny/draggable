@@ -9,7 +9,7 @@
 		define([], factory);
 	} else {
 		// Browser globals (root is window)
-		root.$ = factory();
+		root.jQuery = factory();
 	}
 }(this, function () {
 
@@ -17,7 +17,7 @@
 
 	var isIE = navigator.appName === 'Microsoft Internet Explorer';
 
-	var $ = function (element) {
+	var jQuery = function (element) {
 
 		return element instanceof Wrap
 			? element
@@ -33,7 +33,7 @@
 
 	// prototype methods
 
-	extend($, {
+	extend(jQuery, {
 
 		extend: extend
 
@@ -97,6 +97,6 @@
 
 	// export
 
-	return $;
+	return jQuery;
 
 }));
