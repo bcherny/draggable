@@ -40,7 +40,20 @@
 
 	var hasTouch = ('ontouchstart' in window) || ('DocumentTouch' in window && document instanceof DocumentTouch), // this breaks Firefox
 		isIE = navigator.appName === 'Microsoft Internet Explorer',
-		$document = $(document);
+		$document = $(document),
+		transform = (function(){
+
+			var prefixes = ' -o- -ms- -moz- -webkit-'.split(' ');
+			var style = document.body.style;
+
+			for (var n = prefixes.length; n--;) {
+				var property = prefixes[n] + 'transform';
+				if (property in style) {
+					return property;
+				}
+			}
+
+		})();
 
 	/*
 		usage:
@@ -50,7 +63,7 @@
 		new Draggable (element)
 	*/
 
-	var Draggable = function (element, options) {
+	function Draggable (element, options) {
 
 		var me = this,
 			start = bind(me.start, me),
@@ -67,6 +80,7 @@
 
 			// DOM element
 			element: element,
+			$element: $(element),
 
 			// DOM event handlers
 			handlers: {
@@ -93,6 +107,48 @@
 
 	$.extend (Draggable.prototype, {
 
+		// public
+
+		setOption: function (property, value) {
+
+			var me = this;
+
+			me.options[property] = value;
+			me.initialize();
+
+			return me;
+
+		},
+
+		get: function() {
+
+			var dragEvent = this.dragEvent;
+
+			return {
+				x: dragEvent.x,
+				y: dragEvent.y
+			};
+
+		},
+
+		set: function (x, y) {
+
+			var me = this,
+				dragEvent = me.dragEvent;
+
+			dragEvent.original = {
+				x: dragEvent.x,
+				y: dragEvent.y
+			};
+
+			me.move(x, y);
+
+			return me;
+
+		},
+
+		// internal
+
 		dragEvent: {
 			started: false,
 			x: 0,
@@ -102,8 +158,11 @@
 		initialize: function() {
 
 			var me = this,
-				style = me.element.style,
-				options = me.options;
+				element = me.element,
+				style = element.style,
+				compStyle = getStyle(element),
+				options = me.options,
+				oldTransform;
 
 			// cache element dimensions (for performance)
 
@@ -114,13 +173,29 @@
 				width: element.offsetWidth
 			};
 
+			// shift compositing over to the GPU if the browser supports it (for performance)
+
+			if (transform) {
+
+				// concatenate to any existing transform
+				// so we don't accidentally override it
+				oldTransform = compStyle[transform];
+
+				if (oldTransform === 'none') {
+					oldTransform = '';
+				}
+
+				style[transform] = oldTransform + ' translate3d(0,0,0)';
+			}
+
 			// optional styling
 			
 			if (options.setPosition) {
+				style.display = 'block';
 				style.left = _dimensions.left + 'px';
 				style.top = _dimensions.top + 'px';
-				style.right = 'auto';
-				style.bottom = 'auto';
+				style.bottom = style.right = 'auto';
+				style.margin = 0;
 				style.position = 'absolute';
 			}
 
@@ -128,8 +203,17 @@
 				style.cursor = 'move';
 			}
 
+			// set limit
+			me.setLimit(options.limit);
+
+			// set position in model
+			$.extend(me.dragEvent, {
+				x: _dimensions.left,
+				y: _dimensions.top
+			});
+
 			// attach mousedown event
-			$document.on(me.handlers.start);
+			me.$element.on(me.handlers.start);
 
 		},
 
@@ -163,112 +247,62 @@
 
 		drag: function (e) {
 
-			var me = this;
-			var dragEvent = me.dragEvent;
-			var element = me.element;
-			var initialCursor = me._cursor;
-			var initialPosition = me._dimensions;
-			var initialX = initialCursor.x;
-			var initialY = initialCursor.y;
-			var options = me.options;
-			var zoom = initialPosition.zoom;
+			var me = this,
+				dragEvent = me.dragEvent,
+				element = me.element,
+				initialCursor = me._cursor,
+				initialPosition = me._dimensions,
+				options = me.options,
+				zoom = initialPosition.zoom,
+				cursor = me.getCursor(e),
+				threshold = options.threshold,
+				x = (cursor.x - initialCursor.x)/zoom + initialPosition.left,
+				y = (cursor.y - initialCursor.y)/zoom + initialPosition.top;
 
-			// prevent race condition where this stuff isn't computed yet
-			//if (isDefined(initialX) && isDefined(initialPosition.left)) {
+			// check threshold
+			if (!dragEvent.started && threshold &&
+				(Math.abs(initialCursor.x - cursor.x) < threshold) &&
+				(Math.abs(initialCursor.y - cursor.y) < threshold)
+			) {
+				return;
+			}
 
-				var cursor = me.getCursor(e);
-				var threshold = options.threshold;
-				var x = (cursor.x - initialX)/zoom + initialPosition.left;
-				var y = (cursor.y - initialY)/zoom + initialPosition.top;
+			// trigger start event?
+			if (!dragEvent.started) {
+				options.onDragStart(element, x, y, e);
+				$.extend(dragEvent, {
+					original: {
+						x: x,
+						y: y
+					},
+					started: true
+				});
+			}
 
-				// check threshold
-				if (!dragEvent.started && threshold &&
-					(Math.abs(initialX - cursor.x) < threshold) &&
-					(Math.abs(initialY - cursor.y) < threshold)
-				) {
-					return;
-				}
+			// move the element
+			if (me.move(x, y)) {
 
-				// trigger start event?
-				if (!dragEvent.started) {
-					options.onDragStart(element, initialX, initialY, e);
-					$.extend(dragEvent, {
-						original: {
-							x: x,
-							y: y
-						},
-						started: true
-					});
-				}
-
-				// move the element
-				if (me.move(x, y)) {
-
-					// trigger drag event
-					options.onDrag(element, x, y, e);
-				}
-			//}
+				// trigger drag event
+				options.onDrag(element, dragEvent.x, dragEvent.y, e);
+			}
 
 		},
 
 		move: function (x, y) {
 
 			var me = this,
-				dimensions = me._dimensions,
 				dragEvent = me.dragEvent,
 				options = me.options,
 				grid = options.grid,
-				limit = options.limit,
-				limitExists = isDefined(limit),
-				style = element.style,
-				lowIsOk_x,
-				highIsOk_x,
-				lowIsOk_y,
-				highIsOk_y,
-				coords;
-
-			if (!(limit instanceof Function)) {
-				if (limitExists && limit.x !== null) {
-					if (limit.x[1]) {
-						lowIsOk_x  = x > limit.x[0];
-						highIsOk_x = x + dimensions.width <= limit.x[1];
-					} else {
-						x = limit.x;
-						lowIsOk_x = highIsOk_x = 1;
-					}
-				} else lowIsOk_x = highIsOk_x = 1;
-
-				if (limitExists && limit.y !== null) {
-					if (limit.y[1]) {
-						lowIsOk_y  = y > limit.y[0],
-						highIsOk_y = y + dimensions.height <= limit.y[1];
-					} else {
-						y = limit.y;
-						lowIsOk_y = highIsOk_y = 1;
-					}
-				} else lowIsOk_y = highIsOk_y = 1;
-
-			} else {
-
-				coords = limit(x, y, dragEvent.original.x, dragEvent.original.y);
-				if (!coords) return;
-				x = coords[0];
-				y = coords[1];
-				lowIsOk_x = highIsOk_x = lowIsOk_y = highIsOk_y = 1;
-
-			}
-
-			// compute final coords
-			var pos = {
-				x: lowIsOk_x && highIsOk_x ? x : (!lowIsOk_x ? 0 : (limit.x[1]-dimensions.width)),
-				y: lowIsOk_y && highIsOk_y ? y : (!lowIsOk_y ? 0 : (limit.y[1]-dimensions.height))
-			};
+				style = me.element.style,
+				pos = me.limit(x, y, dragEvent.original.x, dragEvent.original.y);
 
 			// snap to grid?
 			if (!options.smoothDrag && grid) {
 				pos = me.round (pos, grid);
 			}
 
+			// move it
 			if (pos.x !== dragEvent.x || pos.y !== dragEvent.y) {
 
 				dragEvent.x = pos.x;
@@ -303,6 +337,7 @@
 			if (options.smoothDrag && grid) {
 				pos = me.round({ x: dragEvent.x, y: dragEvent.y }, grid);
 				me.move(pos.x, pos.y);
+				$.extend(me.dragEvent, pos);
 			}
 
 			// trigger dragend event
@@ -321,9 +356,7 @@
 				dragEvent = me.dragEvent;
 
 			dragEvent = {
-				started: false,
-				x: 0,
-				y: 0
+				started: false
 			};
 
 		},
@@ -351,6 +384,243 @@
 		setCursor: function (xy) {
 
 			this._cursor = xy;
+
+		},
+
+		setLimit: function (limit) {
+
+			var me = this,
+				_true = function (x, y) {
+					return { x:x, y:y };
+				};
+
+			// limit is a function
+			if (isFunction(limit)) {
+
+				me.limit = limit;
+
+			}
+
+			// limit is an element
+			else if (isElement(limit)) {
+
+				var draggableSize = me._dimensions,
+					height = limit.scrollHeight - draggableSize.height,
+					width = limit.scrollWidth - draggableSize.width;
+
+				me.limit = function (x, y) {
+
+					if (x < 0) x = 0;
+					else if (x > width) x = width;
+
+					if (y < 0) y = 0;
+					else if (y > height) y = height;
+
+					return {
+						x: x,
+						y: y
+					}
+				};
+
+			}
+
+			// limit is defined
+			else if (limit) {
+
+				var defined = {
+					x: isDefined(limit.x),
+					y: isDefined(limit.y)
+				};
+				var _x, _y;
+
+				// {Undefined} limit.x, {Undefined} limit.y
+				if (!defined.x && !defined.y) {
+
+					me.limit = _true;
+
+				}
+
+				// {Undefined} limit.y
+				else if (defined.x && !defined.y) {
+
+					// {Array} limit.x, {Undefined} limit.y
+					if (isArray(limit.x)) {
+
+						_x = [
+							+limit.x[0],
+							+limit.x[1]
+						];
+
+						me.limit = function (x, y) {
+
+							if (x < _x[0]) x = _x[0];
+							else if (x > _x[1]) x = _x[1];
+
+							return {
+								x: x,
+								y: y
+							};
+
+						};
+
+					}
+
+					// {Number} limit.x, {Undefined} limit.y
+					else {
+
+						_x = +limit.x;
+
+						me.limit = function (x, y) {
+							return {
+								x: _x,
+								y: y
+							};
+						};
+
+					}
+
+				}
+
+				// {Undefined} limit.x
+				else if (!defined.x && defined.y) {
+
+					// {Undefined} limit.x, {Array} limit.y
+					if (isArray(limit.y)) {
+
+						_y = [
+							+limit.y[0],
+							+limit.y[1]
+						];
+
+						me.limit = function (x, y) {
+
+							if (y < _y[0]) y = _y[0];
+							else if (y > _y[1]) y = _y[1];
+
+							return {
+								x: x,
+								y: y
+							};
+
+						};
+
+					}
+
+					// {Undefined} limit.x, {Number} limit.y
+					else {
+
+						_y = +limit.y;
+
+						me.limit = function (x, y) {
+							return {
+								x: x,
+								y: _y
+							};
+						};
+
+					}
+
+				} else {
+
+					// {Array} limit.x, {Array} limit.y
+					if (isArray(limit.x) && isArray(limit.y)) {
+
+						_x = [
+							+limit.x[0],
+							+limit.x[1]
+						];
+						_y = [
+							+limit.y[0],
+							+limit.y[1]
+						];
+
+						me.limit = function (x, y) {
+
+							if (x < _x[0]) x = _x[0];
+							else if (x > _x[1]) x = _x[1];
+
+							if (y < _y[0]) y = _y[0];
+							else if (y > _y[1]) y = _y[1];
+
+							return {
+								x: x,
+								y: y
+							};
+
+						};
+
+					}
+
+					// {Array} limit.x, {Number} limit.y
+					else if (isArray(limit.x)) {
+
+						_x = [
+							+limit.x[0],
+							+limit.x[1]
+						];
+						_y = +limit.y;
+
+						me.limit = function (x, y) {
+
+							if (x < _x[0]) x = _x[0];
+							else if (x > _x[1]) x = _x[1];
+
+							return {
+								x: x,
+								y: _y
+							};
+
+						};
+
+					}
+
+					// {Number} limit.x, {Array} limit.y
+					else if (isArray(limit.y)) {
+
+						_x = +limit.x;
+						_y = [
+							+limit.y[0],
+							+limit.y[1]
+						];
+
+						me.limit = function (x, y) {
+
+							if (y < _y[0]) y = _y[0];
+							else if (y > _y[1]) y = _y[1];
+
+							return {
+								x: _x,
+								y: y
+							};
+
+						};
+
+					}
+
+					// {Number} limit.x, {Number} limit.y
+					else {
+
+						_x = +limit.x;
+						_y = +limit.y;
+
+						me.limit = function (x, y) {
+
+							return {
+								x: _x,
+								y: _y
+							};
+
+						};
+					}
+				}
+			}
+
+			// limit is `null` or `undefined`
+			else {
+
+				me.limit = _true;
+
+			}
 
 		},
 
@@ -418,12 +688,20 @@
 		return isIE ? element.currentStyle : getComputedStyle(element);
 	}
 
-	function isDefined (something) {
-		return something !== void 0;
+	function isArray (thing) {
+		return thing instanceof Array; // HTMLElement
 	}
 
-	function isElement (o) {
-		return o instanceof Node; // HTMLElement
+	function isDefined (thing) {
+		return thing !== void 0 && thing !== null;
+	}
+
+	function isElement (thing) {
+		return thing instanceof Node; // HTMLElement
+	}
+
+	function isFunction (thing) {
+		return thing instanceof Function;
 	}
 
 	function noop (){};

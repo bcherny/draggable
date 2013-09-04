@@ -36,15 +36,15 @@ new Draggable (element);
 
 ## Options
 
-| Option 			| Type			| Default			| Description							|
-|-------------------|---------------|-------------------|---------------------------------------|
-| **grid**			| `Number`		| `0`				| grid size for snapping on drag 	|
-| **filterTarget**	| `Function(target)`	| `null`		| prevent drag when target passes this test |
-| **limit**			| `Function(x, y, x0, y0)` or `Object` | `{ x: null, y: null }` | limit x/y drag bounds		|
-| **threshold**		| `Number`		| `0`				| threshold before drag begins (in px)	|
-| **setCursor**		| `Boolean` (truthy) | `false`		| change cursor to `move`?				|
-| **setPosition**	| `Boolean` (truthy) | `true`			| change draggable position to `absolute`? |
-| **smoothDrag**	| `Boolean` (truthy) | `true`			| snap to grid only when dropped, not during drag |
+| Option 			| Type					| Default	| Description															|
+|-------------------|-----------------------|-----------|-----------------------------------------------------------------------|
+| **grid**			| `Number`				| `0`		| grid size for snapping on drag 										|
+| **filterTarget**	| `Function(target)`	| `null`	| prevent drag when target passes this test								|
+| **limit**			| `Element`, `Function(x, y, x0, y0)`, or `Object` 	| `{ x: null, y: null }` | limit x/y drag bounds		|
+| **threshold**		| `Number`				| `0`		| threshold before drag begins (in px)									|
+| **setCursor**		| `Boolean` (truthy)	| `false`	| change cursor to `move`?												|
+| **setPosition**	| `Boolean` (truthy)	| `true`	| change draggable position to `absolute`?								|
+| **smoothDrag**	| `Boolean` (truthy)	| `true`	| snap to grid only when dropped, not during drag						|
 
 ## Events
 
@@ -54,12 +54,19 @@ new Draggable (element);
 | onDragStart		| `element, x, y, event`	|
 | onDragEnd			| `element, x, y, event`	|
 
+## Instance methods
+
+| Method		| Arguments									| Returns				| Description
+|---------------|-------------------------------------------|-----------------------|-------------------------------------------|
+| get			| 											| `{Object}` {x, y}		| Get the current coordinates				|
+| set			| `{Number}` x, `{Number}` y				| instance				| Move to the specified coordinates			|
+| setOption		| `{String}` property, `{Mixed}` value		| instance				| Set an option in the live instance		|
+
 ## Notes
 
 Options.limit accepts arguments in several forms:
 
 ```js
-
 // no limit
 limit: null
 
@@ -81,6 +88,9 @@ limit: {
 	y: 5
 }
 
+// bound with an element
+limit: document.getElementById('id')
+
 // bound with a custom function
 limit: function (
 	x,	// current X coordinate
@@ -91,10 +101,26 @@ limit: function (
 	
 	var radius = 100,
 		dx = x - x0,
-		dy = y - y0
+		dy = y - y0,
+		distance = Math.sqrt(dx*dx + dy*dy),
 
-	// only allow dragging within a circle of radius 100
-	return Math.sqrt(dx*dx + dy*dy) < radius
+		// only allow dragging within a circle of radius 100
+		outOfRange = distance > radius;
+
+	
+	// if our point is outside of the circle, compute the
+	// point on the circle's edge closest to our point
+	if (outOfRange) {
+
+		x = x0 + radius * (x - x0) / distance;
+		y = y0 + radius * (y - y0) / distance;
+		
+	}
+
+	return {
+		x: x,
+		y: y
+	};
+
 }
-
 ```

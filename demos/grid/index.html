@@ -1,0 +1,38 @@
+<html>
+<head>
+	<title>grid demo | draggable.js</title>
+
+	<link rel="stylesheet" href="grid.css" />
+
+</head>
+<body>
+
+	<div id="container">
+		<div class="ball green"></div>
+	</div>
+	<div id="info">
+		<div class="column">
+			<label>
+				Grid size
+				<input type="number" id="input-grid" value="10" />
+			</label>
+			<label>
+				Smooth drag
+				<input type="checkbox" id="input-smooth" checked />
+			</label>
+		</div>
+		<div class="column">
+			<span class="coords-x"></span>
+			<span class="coords-y"></span>
+		</div>
+		<div class="column"></div>
+	</div>
+
+	<script src="../../src/jQueryShim.js"></script>
+	<script src="../../src/draggable.js"></script>
+
+	<!-- this is the script you're looking for... -->
+	<script src="grid.js"></script>
+
+</body>
+</html>
