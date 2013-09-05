@@ -301,6 +301,8 @@
 				style = me.element.style,
 				pos = me.limit(x, y, dragEvent.original.x, dragEvent.original.y);
 
+			console.log('smooth: ', options.smoothDrag, ', grid: ', grid);
+
 			// snap to grid?
 			if (!options.smoothDrag && grid) {
 				pos = me.round (pos, grid);
@@ -311,7 +313,6 @@
 
 				dragEvent.x = pos.x;
 				dragEvent.y = pos.y;
-
 				style.left = pos.x + 'px';
 				style.top = pos.y + 'px';
 
@@ -701,7 +702,7 @@
 	}
 
 	function isElement (thing) {
-		return thing instanceof Node; // HTMLElement
+		return thing instanceof Element || thing instanceof HTMLDocument;
 	}
 
 	function isFunction (thing) {

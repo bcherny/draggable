@@ -1,3 +1,4 @@
+// find our elements
 var elements = document.getElementsByClassName('ball'),
 	labelsX = document.getElementsByClassName('coords-x'),
 	labelsY = document.getElementsByClassName('coords-y');
