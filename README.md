@@ -54,17 +54,17 @@ new Draggable (element);
 
 | Event 			| Arguments					|
 |-------------------|---------------------------|
-| onDrag			| `element, x, y, event`	|
-| onDragStart		| `element, x, y, event`	|
-| onDragEnd			| `element, x, y, event`	|
+| **onDrag**		| `element, x, y, event`	|
+| **onDragStart**	| `element, x, y, event`	|
+| **onDragEnd**		| `element, x, y, event`	|
 
 ## Instance methods
 
 | Method		| Arguments									| Returns				| Description
 |---------------|-------------------------------------------|-----------------------|-------------------------------------------|
-| get			| ---										| `{Object}` {x, y}		| Get the current coordinates				|
-| set			| `{Number}` x, `{Number}` y				| instance				| Move to the specified coordinates			|
-| setOption		| `{String}` property, `{Mixed}` value		| instance				| Set an option in the live instance		|
+| **get**		| ---										| `{Object}` {x, y}		| Get the current coordinates				|
+| **set**		| `{Number}` x, `{Number}` y				| instance				| Move to the specified coordinates			|
+| **setOption**	| `{String}` property, `{Mixed}` value		| instance				| Set an option in the live instance		|
 
 ## Notes
 
