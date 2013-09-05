@@ -129,11 +129,6 @@ limit: function (
 }
 ```
 
-## To do
-
-- Improve performance on old iOS
-- Unit tests
-
 ## Tested on
 
 - Chrome 29 on OSX
@@ -141,5 +136,14 @@ limit: function (
 - Firefox 23 on OSX
 - Firefox 21 on Windows
 - Opera 16 on OSX
-- Safari 6 on OSX, iOS6/iPhone4, iOS6/iPhone5, iOS6/iPad2, iOS6/iPad3
+- Safari 6 on OSX
+- Safari 6 on iPhone4/iOS6
+- Safari 6 on iPhone5/iOS6
+- Safari 6 on iPad2/iOS6
+- Safari 6 on iPad3/iOS6
 - Internet Explorer 8-10 on Windows
+
+## To do
+
+- Improve performance on old iOS
+- Unit tests
