@@ -1,6 +1,6 @@
 #draggable.js
 
-High performance drag and drop in a tiny (1.6k gzipped) package
+High performance drag and drop in a tiny (2k gzipped) package
 
 ## Usage
 
@@ -58,7 +58,7 @@ new Draggable (element);
 
 | Method		| Arguments									| Returns				| Description
 |---------------|-------------------------------------------|-----------------------|-------------------------------------------|
-| get			| 											| `{Object}` {x, y}		| Get the current coordinates				|
+| get			| ---										| `{Object}` {x, y}		| Get the current coordinates				|
 | set			| `{Number}` x, `{Number}` y				| instance				| Move to the specified coordinates			|
 | setOption		| `{String}` property, `{Mixed}` value		| instance				| Set an option in the live instance		|
 
