@@ -1,6 +1,6 @@
 {
 	"name": "draggable",
-	"version": "1.9.6",
+	"version": "1.9.7",
 	"description": "High performance drag and drop in a tiny package",
 	"repository": {
 		"type": "git",
