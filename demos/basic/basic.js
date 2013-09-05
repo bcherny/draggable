@@ -16,7 +16,7 @@ for (var n = elements.length; n--;) {
 	});
 
 	// ... and initialize drag for each
-	new Draggable(elements[n], opts);
+	window.d = new Draggable(elements[n], opts);
 
 }
 

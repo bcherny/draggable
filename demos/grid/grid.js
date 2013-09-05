@@ -36,8 +36,6 @@
 		labelY.innerHTML = y;
 	}
 
-
-window.d = drag;
 	// form events
 	$(inputGrid).on('change', function() {
 

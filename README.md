@@ -131,11 +131,15 @@ limit: function (
 
 ## To do
 
-- Cross-browser testing
+- Improve performance on old iOS
 - Unit tests
 
 ## Tested on
 
 - Chrome 29 on OSX
-- Safari 6 on OSX
-- Safari on iOS6
+- Chrome 28 on Windows
+- Firefox 23 on OSX
+- Firefox 21 on Windows
+- Opera 16 on OSX
+- Safari 6 on OSX, iOS6/iPhone4, iOS6/iPhone5, iOS6/iPad2, iOS6/iPad3
+- Internet Explorer 10 on Windows

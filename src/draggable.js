@@ -229,7 +229,11 @@
 			}
 
 			// prevent browsers from visually dragging the element's outline
-			e.preventDefault();
+			if (e.preventDefault) {
+				e.preventDefault();
+			} else {
+				e.returnValue = false; // IE10
+			}
 
 			// set a high z-index, just in case
 			me.dragEvent.oldZindex = element.style.zIndex;
@@ -647,7 +651,7 @@
 
 				var z = getStyle(element).zoom;
 
-				if (z) {
+				if (z && z !== 'normal') {
 					zoom = z;
 					break;
 				}
