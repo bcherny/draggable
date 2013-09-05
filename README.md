@@ -1,6 +1,10 @@
 #draggable.js
 
-High performance drag and drop in a tiny (2k gzipped) package
+High performance, full featured drag and drop in a tiny (2k gzipped) package.
+
+## Demo
+
+[performancejs.com/draggable.js/demos](http://performancejs.com/draggable.js/demos/)
 
 ## Usage
 
