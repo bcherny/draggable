@@ -76,3 +76,12 @@ h1 {
 	font-size: 40px;
 	line-height: 60px;
 }
+
+/* mobile */
+@media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
+
+	#info {
+		font: bold 16px/32px Arial;
+	}
+
+}

@@ -1,37 +1,9 @@
-/* general */
-
-* {border:0;margin:0;outline:0;padding:0}
-
-body {
-	text-align: center;
-}
-
-/* balls */
-
 .ball {
-	border-radius: 50px;
 	margin: -50px 0 0 -50px;
 	position: absolute;
 		left: 50%;
 		top: 50%;
-	height: 100px;
-	width: 100px;
 	z-index: 1;
-}
-
-.red { background: red }
-.green { background: green }
-.blue { background: blue }
-
-/* layout */
-
-#container {
-	background: #eee;
-	position: fixed;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		top: 0;
 }
 
 #drag-bound-indicator {
@@ -44,49 +16,4 @@ body {
 		top: 50%;
 	width: 300px;
 	z-index: -1;
-}
-
-#info {
-	background: #333;
-	color: #777;
-	font: bold 20px/40px Arial;
-	height: 30%;
-	max-height: 100px;
-	position: fixed;
-		bottom: 0;
-		left: 0;
-		right: 0;
-}
-
-.column {
-	float: left;
-	height: 100%;
-	position: relative;
-	width: 33.33333333%;
-}
-
-.column:after {
-	background: #111;
-	content: "";
-	position: absolute;
-		bottom: 0;
-		right: 0;
-		top: 0;
-	width: 1px;
-}
-
-.coords-x:before,
-.coords-y:before {
-	color: #111;
-	padding-right: 5px;
-	position: relative;
-		top: -1px;
-}
-
-.coords-x:before { content: "x" }
-.coords-y:before { content: "y" }
-
-h1 {
-	font-size: 40px;
-	line-height: 60px;
 }

@@ -36,8 +36,8 @@ function limit (
 	
 	if (outOfRange) {
 
-		x = x0 + radius * (x - x0) / distance;
-		y = y0 + radius * (y - y0) / distance;
+		x = ( x0 + radius * (x - x0) / distance ).toPrecision(4);
+		y = ( y0 + radius * (y - y0) / distance ).toPrecision(4);
 		
 	}
 
