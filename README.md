@@ -133,3 +133,9 @@ limit: function (
 
 - Cross-browser testing
 - Unit tests
+
+## Tested on
+
+- Chrome 29 on OSX
+- Safari 6 on OSX
+- Safari on iOS6
