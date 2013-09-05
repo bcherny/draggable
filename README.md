@@ -1,7 +1,5 @@
 #draggable
 
-*Note: this package is currently in alpha, and has only been tested in Webkit.*
-
 High performance, full featured drag and drop in a tiny (2k gzipped) package.
 
 ## Demo
