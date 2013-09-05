@@ -1,4 +1,6 @@
-#draggable.js
+#draggable
+
+*Note: this package is currently in alpha, and has only been tested in Webkit.*
 
 High performance, full featured drag and drop in a tiny (2k gzipped) package.
 
@@ -10,9 +12,7 @@ High performance, full featured drag and drop in a tiny (2k gzipped) package.
 
 **HTML**
 ```html
-
 <div id="id"></div>
-
 ```
 
 **JavaScript**
@@ -128,3 +128,8 @@ limit: function (
 
 }
 ```
+
+## To do
+
+- Cross-browser testing
+- Unit tests
