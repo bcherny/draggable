@@ -29,7 +29,8 @@
 		// flags
 		setCursor: false,			// change cursor to reflect draggable?
 		setPosition: true,			// change draggable position to absolute?
-		smoothDrag: true,			// snap to grid when dropped, but not during drag
+		smoothDrag: true,			// snap to grid when dropped, but not during
+		useGPU: true,				// move graphics calculation/composition to the GPU
 
 		// event hooks
 		onDrag: noop,				// function(element, X, Y, event)
@@ -38,10 +39,43 @@
 
 	};
 
-	var hasTouch = ('ontouchstart' in window) || ('DocumentTouch' in window && document instanceof DocumentTouch), // this breaks Firefox
-		isIE = navigator.appName === 'Microsoft Internet Explorer',
-		$document = $(document),
-		transform = (function(){
+	var env = {
+
+		// touch support flag
+		touch: ('ontouchstart' in window) || ('DocumentTouch' in window && document instanceof DocumentTouch),
+
+		// internet explorer flag
+		ie: navigator.appName === 'Microsoft Internet Explorer',
+
+		// iOS version string
+		ipad: (function(){
+
+			if (navigator.platform.indexOf('iPad') > -1) {
+
+				$(window).on('devicemotion', _get);
+
+				window.ondevicemotion()
+
+			}
+
+			function _get (e) {
+
+				$(window).off('devicemotion', _get);
+
+				var version = 1;
+
+				if (e.acceleration) {
+					version += window.devicePixelRatio;
+				}
+
+				return version;
+
+			}
+
+		})(),
+
+		// CSS vendor-prefixed transform property
+		transform: (function(){
 
 			var prefixes = ' -o- -ms- -moz- -webkit-'.split(' ');
 			var style = document.body.style;
@@ -53,7 +87,13 @@
 				}
 			}
 
-		})();
+		})()
+
+	};
+
+	var $document = $(document);
+
+	alert(env.ipad);
 
 	/*
 		usage:
@@ -85,11 +125,11 @@
 			// DOM event handlers
 			handlers: {
 
-				start: hasTouch
+				start: env.touch
 					? { touchstart: start }
 					: { mousedown: start },
 
-				move: hasTouch
+				move: env.touch
 					? { touchmove: drag, touchend: stop }
 					: { mousemove: drag, mouseup: stop }
 
@@ -162,6 +202,7 @@
 				style = element.style,
 				compStyle = getStyle(element),
 				options = me.options,
+				transform = env.transform,
 				oldTransform;
 
 			// cache element dimensions (for performance)
@@ -175,7 +216,7 @@
 
 			// shift compositing over to the GPU if the browser supports it (for performance)
 
-			if (transform) {
+			if (options.useGPU && transform) {
 
 				// concatenate to any existing transform
 				// so we don't accidentally override it
@@ -301,8 +342,6 @@
 				style = me.element.style,
 				pos = me.limit(x, y, dragEvent.original.x, dragEvent.original.y);
 
-			console.log('smooth: ', options.smoothDrag, ', grid: ', grid);
-
 			// snap to grid?
 			if (!options.smoothDrag && grid) {
 				pos = me.round (pos, grid);
@@ -380,8 +419,8 @@
 		getCursor: function (e) {
 
 			return {
-				x: (hasTouch ? e.targetTouches[0] : e).clientX,
-				y: (hasTouch ? e.targetTouches[0] : e).clientY
+				x: (env.touch ? e.targetTouches[0] : e).clientX,
+				y: (env.touch ? e.targetTouches[0] : e).clientY
 			};
 
 		},
@@ -690,7 +729,7 @@
 	}
 
 	function getStyle (element) {
-		return isIE ? element.currentStyle : getComputedStyle(element);
+		return env.ie ? element.currentStyle : getComputedStyle(element);
 	}
 
 	function isArray (thing) {
