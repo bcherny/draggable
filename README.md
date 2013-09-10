@@ -1,6 +1,6 @@
 #draggable
 
-High performance, full featured drag and drop in a tiny (2k gzipped) package.
+High performance, cross browser, full featured drag and drop in a tiny (2k gzipped) package.
 
 ## Demo
 
