@@ -47,6 +47,7 @@ new Draggable (element);
 | **setCursor**		| `Boolean` (truthy)	| `false`	| change cursor to `move`?												|
 | **setPosition**	| `Boolean` (truthy)	| `true`	| change draggable position to `absolute`?								|
 | **smoothDrag**	| `Boolean` (truthy)	| `true`	| snap to grid only when dropped, not during drag						|
+| **useGPU**		| `Boolean` (truthy)	| `true`	| move graphics calculation/composition to the GPU? (modern browsers only, graceful degradation) |
 
 ## Events
 

@@ -47,33 +47,6 @@
 		// internet explorer flag
 		ie: navigator.appName === 'Microsoft Internet Explorer',
 
-		// iOS version string
-		ipad: (function(){
-
-			if (navigator.platform.indexOf('iPad') > -1) {
-
-				$(window).on('devicemotion', _get);
-
-				window.ondevicemotion()
-
-			}
-
-			function _get (e) {
-
-				$(window).off('devicemotion', _get);
-
-				var version = 1;
-
-				if (e.acceleration) {
-					version += window.devicePixelRatio;
-				}
-
-				return version;
-
-			}
-
-		})(),
-
 		// CSS vendor-prefixed transform property
 		transform: (function(){
 
@@ -92,8 +65,6 @@
 	};
 
 	var $document = $(document);
-
-	alert(env.ipad);
 
 	/*
 		usage:
