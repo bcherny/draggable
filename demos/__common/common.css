@@ -3,7 +3,51 @@
 * {border:0;margin:0;outline:0;padding:0}
 
 body {
+	font: 13px "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 	text-align: center;
+}
+
+/* navigation */
+
+#nav {
+	background: #ddd;
+	height: 36px;
+	position: absolute;
+		left: 0;
+		right: 0;
+		top: 0;
+}
+
+#nav li {
+	display: inline;
+	list-style: none;
+	margin-right: -4px;
+}
+
+#nav:before {
+	color: #888;
+	content: "Choose a demo:";
+	font-style: italic;
+	padding-right: 10px;
+}
+
+#nav a {
+	color: #666;
+	display: inline-block;
+	line-height: 36px;
+	padding: 0 20px;
+	text-decoration: none;
+}
+
+#nav a:hover {
+	background: #ddd;
+	color: #444;
+}
+
+#nav a.cur {
+	background: #C0427E;
+	color: #fff;
+	font-weight: bold;
 }
 
 /* balls */
@@ -29,7 +73,7 @@ body {
 		bottom: 0;
 		left: 0;
 		right: 0;
-		top: 0;
+		top: 36px;
 }
 
 #info {
