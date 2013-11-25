@@ -1,7 +1,7 @@
 {
 	"name": "draggable",
-	"version": "2.0.0",
-	"description": "High performance, cross browser, full featured drag and drop in a tiny (2k gzipped) package",
+	"version": "2.0.1",
+	"description": "High performance, fully cross browser, full featured drag and drop in a tiny (2k gzipped) package",
 	"repository": {
 		"type": "git",
 		"url": ""
