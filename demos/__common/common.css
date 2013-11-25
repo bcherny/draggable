@@ -40,8 +40,8 @@ body {
 }
 
 #nav a:hover {
-	background: #ddd;
-	color: #444;
+	background: #DA8EB2;
+	color: #fff;
 }
 
 #nav a.cur {
