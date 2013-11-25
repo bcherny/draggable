@@ -4,7 +4,7 @@ High performance, cross browser, full featured drag and drop in a tiny (2k gzipp
 
 ## Demo
 
-[performancejs.com/draggable.js/demos](http://performancejs.com/draggable.js/demos/)
+http://eighttrackmind.github.io/draggable/demos/basic/
 
 ## Usage
 
