@@ -13,714 +13,721 @@
     }
 }(this, function ($) {
 
-	'use strict';
+  'use strict';
 
-	var defaults = {
+  var defaults = {
 
-		// settings
-		grid: 0,					// grid cell size for snapping to on drag
-		filterTarget: null,			// disallow drag when target passes this test
-		limit: {					// limit the drag bounds
-			x: null,				// [minimum position, maximum position] || position
-			y: null					// [minimum position, maximum position] || position
-		},
-		threshold: 0,				// threshold to move before drag begins (in px)
+    // settings
+    grid: 0,                // grid cell size for snapping to on drag
+    filterTarget: null,     // disallow drag when target passes this test
+    limit: {                // limit the drag bounds
+      x: null,              // [minimum position, maximum position] || position
+      y: null               // [minimum position, maximum position] || position
+    },
+    threshold: 0,           // threshold to move before drag begins (in px)
 
-		// flags
-		setCursor: false,			// change cursor to reflect draggable?
-		setPosition: true,			// change draggable position to absolute?
-		smoothDrag: true,			// snap to grid when dropped, but not during
-		useGPU: true,				// move graphics calculation/composition to the GPU
+    // flags
+    setCursor: false,       // change cursor to reflect draggable?
+    setPosition: true,      // change draggable position to absolute?
+    smoothDrag: true,       // snap to grid when dropped, but not during
+    useGPU: true,           // move graphics calculation/composition to the GPU
 
-		// event hooks
-		onDrag: noop,				// function(element, X, Y, event)
-		onDragStart: noop,			// function(element, X, Y, event)
-		onDragEnd: noop				// function(element, X, Y, event)
+    // event hooks
+    onDrag: noop,           // function(element, X, Y, event)
+    onDragStart: noop,      // function(element, X, Y, event)
+    onDragEnd: noop         // function(element, X, Y, event)
 
-	};
+  };
 
-	var env = {
+  var env = {
 
-		// touch support flag
-		touch: ('ontouchstart' in window) || ('DocumentTouch' in window && document instanceof DocumentTouch),
+    // touch support flag
+    touch: ('ontouchstart' in window) || ('DocumentTouch' in window && document instanceof DocumentTouch),
 
-		// internet explorer flag
-		ie: navigator.appName === 'Microsoft Internet Explorer',
+    // internet explorer flag
+    ie: navigator.appName === 'Microsoft Internet Explorer',
 
-		// CSS vendor-prefixed transform property
-		transform: (function(){
+    // CSS vendor-prefixed transform property
+    transform: (function(){
 
-			var prefixes = ' -o- -ms- -moz- -webkit-'.split(' ');
-			var style = document.body.style;
+      var prefixes = ' -o- -ms- -moz- -webkit-'.split(' ');
+      var style = document.body.style;
 
-			for (var n = prefixes.length; n--;) {
-				var property = prefixes[n] + 'transform';
-				if (property in style) {
-					return property;
-				}
-			}
+      for (var n = prefixes.length; n--;) {
+        var property = prefixes[n] + 'transform';
+        if (property in style) {
+          return property;
+        }
+      }
 
-		})()
+    })()
 
-	};
+  };
 
-	var $document = $(document);
+  var $document = $(document);
 
-	/*
-		usage:
+  /*
+    usage:
 
-		new Draggable (element, options)
-			- or -
-		new Draggable (element)
-	*/
+    new Draggable (element, options)
+      - or -
+    new Draggable (element)
+  */
 
-	function Draggable (element, options) {
+  function Draggable (element, options) {
 
-		var me = this,
-			start = bind(me.start, me),
-			drag = bind(me.drag, me),
-			stop = bind(me.stop, me);
+    var me = this,
+      start = bind(me.start, me),
+      drag = bind(me.drag, me),
+      stop = bind(me.stop, me);
 
-		// sanity check
-		if (!isElement(element)) {
-			throw new TypeError('Draggable expects argument 0 to be an Element');
-		}
+    // sanity check
+    if (!isElement(element)) {
+      throw new TypeError('Draggable expects argument 0 to be an Element');
+    }
 
-		// set instance properties
-		$.extend(me, {
+    // set instance properties
+    $.extend(me, {
 
-			// DOM element
-			element: element,
-			$element: $(element),
+      // DOM element
+      element: element,
+      $element: $(element),
 
-			// DOM event handlers
-			handlers: {
+      // DOM event handlers
+      handlers: {
 
-				start: env.touch
-					? { touchstart: start }
-					: { mousedown: start },
+        start: env.touch
+          ? { touchstart: start }
+          : { mousedown: start },
 
-				move: env.touch
-					? { touchmove: drag, touchend: stop }
-					: { mousemove: drag, mouseup: stop }
+        move: env.touch
+          ? { touchmove: drag, touchend: stop }
+          : { mousemove: drag, mouseup: stop }
 
-			},
+      },
 
-			// options
-			options: $.extend({}, defaults, options)
+      // options
+      options: $.extend({}, defaults, options)
 
-		});
+    });
 
-		// initialize
-		me.initialize();
+    // initialize
+    me.initialize();
 
-	}
+  }
 
-	$.extend (Draggable.prototype, {
+  $.extend (Draggable.prototype, {
 
-		// public
+    // public
 
-		setOption: function (property, value) {
+    setOption: function (property, value) {
 
-			var me = this;
+      var me = this;
 
-			me.options[property] = value;
-			me.initialize();
+      me.options[property] = value;
+      me.initialize();
 
-			return me;
+      return me;
 
-		},
+    },
 
-		get: function() {
+    get: function() {
 
-			var dragEvent = this.dragEvent;
+      var dragEvent = this.dragEvent;
 
-			return {
-				x: dragEvent.x,
-				y: dragEvent.y
-			};
+      return {
+        x: dragEvent.x,
+        y: dragEvent.y
+      };
 
-		},
+    },
 
-		set: function (x, y) {
+    set: function (x, y) {
 
-			var me = this,
-				dragEvent = me.dragEvent;
+      var me = this,
+        dragEvent = me.dragEvent;
 
-			dragEvent.original = {
-				x: dragEvent.x,
-				y: dragEvent.y
-			};
+      dragEvent.original = {
+        x: dragEvent.x,
+        y: dragEvent.y
+      };
 
-			me.move(x, y);
+      me.move(x, y);
 
-			return me;
+      return me;
 
-		},
+    },
 
-		// internal
+    // internal
 
-		dragEvent: {
-			started: false,
-			x: 0,
-			y: 0
-		},
+    dragEvent: {
+      started: false,
+      x: 0,
+      y: 0
+    },
 
-		initialize: function() {
+    initialize: function() {
 
-			var me = this,
-				element = me.element,
-				style = element.style,
-				compStyle = getStyle(element),
-				options = me.options,
-				transform = env.transform,
-				oldTransform;
+      var me = this,
+        element = me.element,
+        style = element.style,
+        compStyle = getStyle(element),
+        options = me.options,
+        transform = env.transform,
+        oldTransform;
 
-			// cache element dimensions (for performance)
+      // cache element dimensions (for performance)
 
-			var _dimensions = me._dimensions = {
-				height: element.offsetHeight,
-				left: element.offsetLeft,
-				top: element.offsetTop,
-				width: element.offsetWidth
-			};
+      var _dimensions = me._dimensions = {
+        height: element.offsetHeight,
+        left: element.offsetLeft,
+        top: element.offsetTop,
+        width: element.offsetWidth
+      };
 
-			// shift compositing over to the GPU if the browser supports it (for performance)
+      // shift compositing over to the GPU if the browser supports it (for performance)
 
-			if (options.useGPU && transform) {
+      if (options.useGPU && transform) {
 
-				// concatenate to any existing transform
-				// so we don't accidentally override it
-				oldTransform = compStyle[transform];
+        // concatenate to any existing transform
+        // so we don't accidentally override it
+        oldTransform = compStyle[transform];
 
-				if (oldTransform === 'none') {
-					oldTransform = '';
-				}
+        if (oldTransform === 'none') {
+          oldTransform = '';
+        }
 
-				style[transform] = oldTransform + ' translate3d(0,0,0)';
-			}
+        style[transform] = oldTransform + ' translate3d(0,0,0)';
+      }
 
-			// optional styling
-			
-			if (options.setPosition) {
-				style.display = 'block';
-				style.left = _dimensions.left + 'px';
-				style.top = _dimensions.top + 'px';
-				style.bottom = style.right = 'auto';
-				style.margin = 0;
-				style.position = 'absolute';
-			}
+      // optional styling
+      
+      if (options.setPosition) {
+        style.display = 'block';
+        style.left = _dimensions.left + 'px';
+        style.top = _dimensions.top + 'px';
+        style.bottom = style.right = 'auto';
+        style.margin = 0;
+        style.position = 'absolute';
+      }
 
-			if (options.setCursor) {
-				style.cursor = 'move';
-			}
+      if (options.setCursor) {
+        style.cursor = 'move';
+      }
 
-			// set limit
-			me.setLimit(options.limit);
+      // set limit
+      me.setLimit(options.limit);
 
-			// set position in model
-			$.extend(me.dragEvent, {
-				x: _dimensions.left,
-				y: _dimensions.top
-			});
+      // set position in model
+      $.extend(me.dragEvent, {
+        x: _dimensions.left,
+        y: _dimensions.top
+      });
 
-			// attach mousedown event
-			me.$element.on(me.handlers.start);
+      // attach mousedown event
+      me.$element.on(me.handlers.start);
 
-		},
+    },
 
-		start: function (e) {
+    start: function (e) {
 
-			var me = this;
-			var cursor = me.getCursor(e);
-			var element = me.element;
+      var me = this;
+      var cursor = me.getCursor(e);
+      var element = me.element;
 
-			// filter the target?
-			if (!me.useTarget(e.target)) {
-				return;
-			}
+      // filter the target?
+      if (!me.useTarget(e.target)) {
+        return;
+      }
 
-			// prevent browsers from visually dragging the element's outline
-			if (e.preventDefault) {
-				e.preventDefault();
-			} else {
-				e.returnValue = false; // IE10
-			}
+      // prevent browsers from visually dragging the element's outline
+      if (e.preventDefault) {
+        e.preventDefault();
+      } else {
+        e.returnValue = false; // IE10
+      }
 
-			// set a high z-index, just in case
-			me.dragEvent.oldZindex = element.style.zIndex;
-			element.style.zIndex = 10000;
+      // set a high z-index, just in case
+      me.dragEvent.oldZindex = element.style.zIndex;
+      element.style.zIndex = 10000;
 
-			// set initial position
-			me.setCursor(cursor);
-			me.setPosition();
-			me.setZoom();
+      // set initial position
+      me.setCursor(cursor);
+      me.setPosition();
+      me.setZoom();
 
-			// add event listeners
-			$document.on(me.handlers.move);
+      // add event listeners
+      $document.on(me.handlers.move);
 
-		},
+    },
 
-		drag: function (e) {
+    drag: function (e) {
 
-			var me = this,
-				dragEvent = me.dragEvent,
-				element = me.element,
-				initialCursor = me._cursor,
-				initialPosition = me._dimensions,
-				options = me.options,
-				zoom = initialPosition.zoom,
-				cursor = me.getCursor(e),
-				threshold = options.threshold,
-				x = (cursor.x - initialCursor.x)/zoom + initialPosition.left,
-				y = (cursor.y - initialCursor.y)/zoom + initialPosition.top;
+      var me = this,
+        dragEvent = me.dragEvent,
+        element = me.element,
+        initialCursor = me._cursor,
+        initialPosition = me._dimensions,
+        options = me.options,
+        zoom = initialPosition.zoom,
+        cursor = me.getCursor(e),
+        threshold = options.threshold,
+        x = (cursor.x - initialCursor.x)/zoom + initialPosition.left,
+        y = (cursor.y - initialCursor.y)/zoom + initialPosition.top;
 
-			// check threshold
-			if (!dragEvent.started && threshold &&
-				(Math.abs(initialCursor.x - cursor.x) < threshold) &&
-				(Math.abs(initialCursor.y - cursor.y) < threshold)
-			) {
-				return;
-			}
+      // check threshold
+      if (!dragEvent.started && threshold &&
+        (Math.abs(initialCursor.x - cursor.x) < threshold) &&
+        (Math.abs(initialCursor.y - cursor.y) < threshold)
+      ) {
+        return;
+      }
 
-			// trigger start event?
-			if (!dragEvent.started) {
-				options.onDragStart(element, x, y, e);
-				$.extend(dragEvent, {
-					original: {
-						x: x,
-						y: y
-					},
-					started: true
-				});
-			}
+      // trigger start event?
+      if (!dragEvent.started) {
+        options.onDragStart(element, x, y, e);
+        $.extend(dragEvent, {
+          original: {
+            x: x,
+            y: y
+          },
+          started: true
+        });
+      }
 
-			// move the element
-			if (me.move(x, y)) {
+      // move the element
+      if (me.move(x, y)) {
 
-				// trigger drag event
-				options.onDrag(element, dragEvent.x, dragEvent.y, e);
-			}
+        // trigger drag event
+        options.onDrag(element, dragEvent.x, dragEvent.y, e);
+      }
 
-		},
+    },
 
-		move: function (x, y) {
+    move: function (x, y) {
 
-			var me = this,
-				dragEvent = me.dragEvent,
-				options = me.options,
-				grid = options.grid,
-				style = me.element.style,
-				pos = me.limit(x, y, dragEvent.original.x, dragEvent.original.y);
+      var me = this,
+        dragEvent = me.dragEvent,
+        options = me.options,
+        grid = options.grid,
+        style = me.element.style,
+        pos = me.limit(x, y, dragEvent.original.x, dragEvent.original.y);
 
-			// snap to grid?
-			if (!options.smoothDrag && grid) {
-				pos = me.round (pos, grid);
-			}
+      // snap to grid?
+      if (!options.smoothDrag && grid) {
+        pos = me.round (pos, grid);
+      }
 
-			// move it
-			if (pos.x !== dragEvent.x || pos.y !== dragEvent.y) {
+      // move it
+      if (pos.x !== dragEvent.x || pos.y !== dragEvent.y) {
 
-				dragEvent.x = pos.x;
-				dragEvent.y = pos.y;
-				style.left = pos.x + 'px';
-				style.top = pos.y + 'px';
+        dragEvent.x = pos.x;
+        dragEvent.y = pos.y;
+        style.left = pos.x + 'px';
+        style.top = pos.y + 'px';
 
-				return true;
-			}
+        return true;
+      }
 
-			return false;
+      return false;
 
-		},
+    },
 
-		stop: function (e) {
+    stop: function (e) {
 
-			var me = this,
-				dragEvent = me.dragEvent,
-				element = me.element,
-				options = me.options,
-				grid = options.grid,
-				pos;
+      var me = this,
+        dragEvent = me.dragEvent,
+        element = me.element,
+        options = me.options,
+        grid = options.grid,
+        pos;
 
-			// remove event listeners
-			$document.off(me.handlers.move);
+      // remove event listeners
+      $document.off(me.handlers.move);
 
-			// resent element's z-index
-			element.style.zIndex = dragEvent.oldZindex;
+      // resent element's z-index
+      element.style.zIndex = dragEvent.oldZindex;
 
-			// snap to grid?
-			if (options.smoothDrag && grid) {
-				pos = me.round({ x: dragEvent.x, y: dragEvent.y }, grid);
-				me.move(pos.x, pos.y);
-				$.extend(me.dragEvent, pos);
-			}
+      // snap to grid?
+      if (options.smoothDrag && grid) {
+        pos = me.round({ x: dragEvent.x, y: dragEvent.y }, grid);
+        me.move(pos.x, pos.y);
+        $.extend(me.dragEvent, pos);
+      }
 
-			// trigger dragend event
-			if (me.dragEvent.started) {
-				options.onDragEnd(element, dragEvent.x, dragEvent.y, e);
-			}
+      // trigger dragend event
+      if (me.dragEvent.started) {
+        options.onDragEnd(element, dragEvent.x, dragEvent.y, e);
+      }
 
-			// clear temp vars
-			me.reset();
+      // clear temp vars
+      me.reset();
 
-		},
+    },
 
-		reset: function() {
+    reset: function() {
 
-			var me = this,
-				dragEvent = me.dragEvent;
+      var me = this,
+        dragEvent = me.dragEvent;
 
-			dragEvent = {
-				started: false
-			};
+      dragEvent = {
+        started: false
+      };
 
-		},
+    },
 
-		round: function (pos) {
+    round: function (pos) {
 
-			var grid = this.options.grid;
+      var grid = this.options.grid;
 
-			return {
-				x: grid * Math.round(pos.x/grid),
-				y: grid * Math.round(pos.y/grid)
-			};
+      return {
+        x: grid * Math.round(pos.x/grid),
+        y: grid * Math.round(pos.y/grid)
+      };
 
-		},
+    },
 
-		getCursor: function (e) {
+    getCursor: function (e) {
 
-			return {
-				x: (env.touch ? e.targetTouches[0] : e).clientX,
-				y: (env.touch ? e.targetTouches[0] : e).clientY
-			};
+      return {
+        x: (env.touch ? e.targetTouches[0] : e).clientX,
+        y: (env.touch ? e.targetTouches[0] : e).clientY
+      };
 
-		},
+    },
 
-		setCursor: function (xy) {
+    setCursor: function (xy) {
 
-			this._cursor = xy;
+      this._cursor = xy;
 
-		},
+    },
 
-		setLimit: function (limit) {
+    setLimit: function (limit) {
 
-			var me = this,
-				_true = function (x, y) {
-					return { x:x, y:y };
-				};
+      var me = this,
+        _true = function (x, y) {
+          return { x:x, y:y };
+        };
 
-			// limit is a function
-			if (isFunction(limit)) {
+      // limit is a function
+      if (isFunction(limit)) {
 
-				me.limit = limit;
+        me.limit = limit;
 
-			}
+      }
 
-			// limit is an element
-			else if (isElement(limit)) {
+      // limit is an element
+      else if (isElement(limit)) {
 
-				var draggableSize = me._dimensions,
-					height = limit.scrollHeight - draggableSize.height,
-					width = limit.scrollWidth - draggableSize.width;
+        var draggableSize = me._dimensions,
+          height = limit.scrollHeight - draggableSize.height,
+          width = limit.scrollWidth - draggableSize.width;
 
-				me.limit = function (x, y) {
+        me.limit = function (x, y) {
 
-					if (x < 0) x = 0;
-					else if (x > width) x = width;
+          if (x < 0) x = 0;
+          else if (x > width) x = width;
 
-					if (y < 0) y = 0;
-					else if (y > height) y = height;
+          if (y < 0) y = 0;
+          else if (y > height) y = height;
 
-					return {
-						x: x,
-						y: y
-					}
-				};
+          return {
+            x: x,
+            y: y
+          }
+        };
 
-			}
+      }
 
-			// limit is defined
-			else if (limit) {
+      // limit is defined
+      else if (limit) {
 
-				var defined = {
-					x: isDefined(limit.x),
-					y: isDefined(limit.y)
-				};
-				var _x, _y;
+        var defined = {
+          x: isDefined(limit.x),
+          y: isDefined(limit.y)
+        };
+        var _x, _y;
 
-				// {Undefined} limit.x, {Undefined} limit.y
-				if (!defined.x && !defined.y) {
+        // {Undefined} limit.x, {Undefined} limit.y
+        if (!defined.x && !defined.y) {
 
-					me.limit = _true;
+          me.limit = _true;
 
-				}
+        }
 
-				// {Undefined} limit.y
-				else if (defined.x && !defined.y) {
+        // {Undefined} limit.y
+        else if (defined.x && !defined.y) {
 
-					// {Array} limit.x, {Undefined} limit.y
-					if (isArray(limit.x)) {
+          // {Array} limit.x, {Undefined} limit.y
+          if (isArray(limit.x)) {
 
-						_x = [
-							+limit.x[0],
-							+limit.x[1]
-						];
+            _x = [
+              +limit.x[0],
+              +limit.x[1]
+            ];
 
-						me.limit = function (x, y) {
+            me.limit = function (x, y) {
 
-							if (x < _x[0]) x = _x[0];
-							else if (x > _x[1]) x = _x[1];
+              if (x < _x[0]) x = _x[0];
+              else if (x > _x[1]) x = _x[1];
 
-							return {
-								x: x,
-								y: y
-							};
+              return {
+                x: x,
+                y: y
+              };
 
-						};
+            };
 
-					}
+          }
 
-					// {Number} limit.x, {Undefined} limit.y
-					else {
+          // {Number} limit.x, {Undefined} limit.y
+          else {
 
-						_x = +limit.x;
+            _x = +limit.x;
 
-						me.limit = function (x, y) {
-							return {
-								x: _x,
-								y: y
-							};
-						};
+            me.limit = function (x, y) {
+              return {
+                x: _x,
+                y: y
+              };
+            };
 
-					}
+          }
 
-				}
+        }
 
-				// {Undefined} limit.x
-				else if (!defined.x && defined.y) {
+        // {Undefined} limit.x
+        else if (!defined.x && defined.y) {
 
-					// {Undefined} limit.x, {Array} limit.y
-					if (isArray(limit.y)) {
+          // {Undefined} limit.x, {Array} limit.y
+          if (isArray(limit.y)) {
 
-						_y = [
-							+limit.y[0],
-							+limit.y[1]
-						];
+            _y = [
+              +limit.y[0],
+              +limit.y[1]
+            ];
 
-						me.limit = function (x, y) {
+            me.limit = function (x, y) {
 
-							if (y < _y[0]) y = _y[0];
-							else if (y > _y[1]) y = _y[1];
+              if (y < _y[0]) y = _y[0];
+              else if (y > _y[1]) y = _y[1];
 
-							return {
-								x: x,
-								y: y
-							};
+              return {
+                x: x,
+                y: y
+              };
 
-						};
+            };
 
-					}
+          }
 
-					// {Undefined} limit.x, {Number} limit.y
-					else {
+          // {Undefined} limit.x, {Number} limit.y
+          else {
 
-						_y = +limit.y;
+            _y = +limit.y;
 
-						me.limit = function (x, y) {
-							return {
-								x: x,
-								y: _y
-							};
-						};
+            me.limit = function (x, y) {
+              return {
+                x: x,
+                y: _y
+              };
+            };
 
-					}
+          }
 
-				} else {
+        } else {
 
-					// {Array} limit.x, {Array} limit.y
-					if (isArray(limit.x) && isArray(limit.y)) {
+          // {Array} limit.x, {Array} limit.y
+          if (isArray(limit.x) && isArray(limit.y)) {
 
-						_x = [
-							+limit.x[0],
-							+limit.x[1]
-						];
-						_y = [
-							+limit.y[0],
-							+limit.y[1]
-						];
+            _x = [
+              +limit.x[0],
+              +limit.x[1]
+            ];
+            _y = [
+              +limit.y[0],
+              +limit.y[1]
+            ];
 
-						me.limit = function (x, y) {
+            me.limit = function (x, y) {
 
-							if (x < _x[0]) x = _x[0];
-							else if (x > _x[1]) x = _x[1];
+              if (x < _x[0]) x = _x[0];
+              else if (x > _x[1]) x = _x[1];
 
-							if (y < _y[0]) y = _y[0];
-							else if (y > _y[1]) y = _y[1];
+              if (y < _y[0]) y = _y[0];
+              else if (y > _y[1]) y = _y[1];
 
-							return {
-								x: x,
-								y: y
-							};
+              return {
+                x: x,
+                y: y
+              };
 
-						};
+            };
 
-					}
+          }
 
-					// {Array} limit.x, {Number} limit.y
-					else if (isArray(limit.x)) {
+          // {Array} limit.x, {Number} limit.y
+          else if (isArray(limit.x)) {
 
-						_x = [
-							+limit.x[0],
-							+limit.x[1]
-						];
-						_y = +limit.y;
+            _x = [
+              +limit.x[0],
+              +limit.x[1]
+            ];
+            _y = +limit.y;
 
-						me.limit = function (x, y) {
+            me.limit = function (x, y) {
 
-							if (x < _x[0]) x = _x[0];
-							else if (x > _x[1]) x = _x[1];
+              if (x < _x[0]) x = _x[0];
+              else if (x > _x[1]) x = _x[1];
 
-							return {
-								x: x,
-								y: _y
-							};
+              return {
+                x: x,
+                y: _y
+              };
 
-						};
+            };
 
-					}
+          }
 
-					// {Number} limit.x, {Array} limit.y
-					else if (isArray(limit.y)) {
+          // {Number} limit.x, {Array} limit.y
+          else if (isArray(limit.y)) {
 
-						_x = +limit.x;
-						_y = [
-							+limit.y[0],
-							+limit.y[1]
-						];
+            _x = +limit.x;
+            _y = [
+              +limit.y[0],
+              +limit.y[1]
+            ];
 
-						me.limit = function (x, y) {
+            me.limit = function (x, y) {
 
-							if (y < _y[0]) y = _y[0];
-							else if (y > _y[1]) y = _y[1];
+              if (y < _y[0]) y = _y[0];
+              else if (y > _y[1]) y = _y[1];
 
-							return {
-								x: _x,
-								y: y
-							};
+              return {
+                x: _x,
+                y: y
+              };
 
-						};
+            };
 
-					}
+          }
 
-					// {Number} limit.x, {Number} limit.y
-					else {
+          // {Number} limit.x, {Number} limit.y
+          else {
 
-						_x = +limit.x;
-						_y = +limit.y;
+            _x = +limit.x;
+            _y = +limit.y;
 
-						me.limit = function (x, y) {
+            me.limit = function (x, y) {
 
-							return {
-								x: _x,
-								y: _y
-							};
+              return {
+                x: _x,
+                y: _y
+              };
 
-						};
-					}
-				}
-			}
+            };
+          }
+        }
+      }
 
-			// limit is `null` or `undefined`
-			else {
+      // limit is `null` or `undefined`
+      else {
 
-				me.limit = _true;
+        me.limit = _true;
 
-			}
+      }
 
-		},
+    },
 
-		setPosition: function() {
+    setPosition: function() {
 
-			var me = this,
-				element = me.element,
-				style = element.style;
+      var me = this,
+        element = me.element,
+        style = element.style;
 
-			$.extend(me._dimensions, {
-				left: parse(style.left) || element.offsetLeft,
-				top: parse(style.top) || element.offsetTop
-			});
+      $.extend(me._dimensions, {
+        left: parse(style.left) || element.offsetLeft,
+        top: parse(style.top) || element.offsetTop
+      });
 
-		},
+    },
 
-		setZoom: function() {
+    setZoom: function() {
 
-			var me = this;
-			var element = me.element;
-			var zoom = 1;
+      var me = this;
+      var element = me.element;
+      var zoom = 1;
 
-			while (element = element.offsetParent) {
+      while (element = element.offsetParent) {
 
-				var z = getStyle(element).zoom;
+        var z = getStyle(element).zoom;
 
-				if (z && z !== 'normal') {
-					zoom = z;
-					break;
-				}
+        if (z && z !== 'normal') {
+          zoom = z;
+          break;
+        }
 
-			}
+      }
 
-			me._dimensions.zoom = zoom;
+      me._dimensions.zoom = zoom;
 
-		},
+    },
 
-		useTarget: function (element) {
+    useTarget: function (element) {
 
-			var filterTarget = this.options.filterTarget;
+      var filterTarget = this.options.filterTarget;
 
-			if (filterTarget instanceof Function) {
-				return filterTarget(element);
-			}
+      if (filterTarget instanceof Function) {
+        return filterTarget(element);
+      }
 
-			return true;
+      return true;
 
-		}
+    },
 
-	});
+    destroy: function () {
 
-	// helpers
+      this.$element.off(this.handlers.start);
+      $document.off(this.handlers.move);
 
-	function bind (fn, context) {
-		return function() {
-			fn.apply(context, arguments);
-		}
-	}
+    }
 
-	function parse (string) {
-		return parseInt(string, 10);
-	}
+  });
 
-	function getStyle (element) {
-		return env.ie ? element.currentStyle : getComputedStyle(element);
-	}
+  // helpers
 
-	function isArray (thing) {
-		return thing instanceof Array; // HTMLElement
-	}
+  function bind (fn, context) {
+    return function() {
+      fn.apply(context, arguments);
+    }
+  }
 
-	function isDefined (thing) {
-		return thing !== void 0 && thing !== null;
-	}
+  function parse (string) {
+    return parseInt(string, 10);
+  }
 
-	function isElement (thing) {
-		return thing instanceof Element || thing instanceof HTMLDocument;
-	}
+  function getStyle (element) {
+    return env.ie ? element.currentStyle : getComputedStyle(element);
+  }
 
-	function isFunction (thing) {
-		return thing instanceof Function;
-	}
+  function isArray (thing) {
+    return thing instanceof Array; // HTMLElement
+  }
 
-	function noop (){};
+  function isDefined (thing) {
+    return thing !== void 0 && thing !== null;
+  }
 
-	return Draggable;
+  function isElement (thing) {
+    return thing instanceof Element || thing instanceof HTMLDocument;
+  }
+
+  function isFunction (thing) {
+    return thing instanceof Function;
+  }
+
+  function noop (){};
+
+  return Draggable;
 
 }));

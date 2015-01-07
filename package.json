@@ -1,11 +1,8 @@
 {
 	"name": "draggable",
-	"version": "2.0.1",
+	"version": "2.1.0",
 	"description": "High performance, fully cross browser, full featured drag and drop in a tiny (2k gzipped) package",
-	"repository": {
-		"type": "git",
-		"url": ""
-	},
+	"homepage": "http://bcherny.github.io/draggable/demos",
 	"author": "Boris Cherny <boris@performancejs.com>",
 	"contributors": [
 		{
@@ -24,7 +21,7 @@
 	"dependencies": {},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/eighttrackmind/draggable.git"
+		"url": "https://github.com/bcherny/draggable.git"
 	},
 	"keywords": ["drag", "drop", "drag and drop", "dragndrop", "move"]
 }
