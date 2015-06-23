@@ -357,6 +357,7 @@
       // trigger dragend event
       if (me.dragEvent.started) {
         options.onDragEnd(element, dragEvent.x, dragEvent.y, e);
+        me.dragEvent.started = false;
       }
 
       // clear temp vars
@@ -724,4 +725,4 @@
 
   return Draggable;
 
-}));
+}));
