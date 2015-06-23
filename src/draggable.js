@@ -283,16 +283,15 @@
         return;
       }
 
+      // save original position?
+      if (!dragEvent.original) {
+        dragEvent.original = { x: x, y: y };
+      }
+
       // trigger start event?
       if (!dragEvent.started) {
         options.onDragStart(element, x, y, e);
-        $.extend(dragEvent, {
-          original: {
-            x: x,
-            y: y
-          },
-          started: true
-        });
+        dragEvent.started = true;
       }
 
       // move the element
@@ -367,12 +366,7 @@
 
     reset: function() {
 
-      var me = this,
-        dragEvent = me.dragEvent;
-
-      dragEvent = {
-        started: false
-      };
+      this.dragEvent.started = false;
 
     },
 

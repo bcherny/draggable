@@ -1,9 +1,10 @@
 {
 	"name": "draggable",
-	"version": "2.1.0",
+	"version": "2.1.1",
 	"description": "High performance, fully cross browser, full featured drag and drop in a tiny (2k gzipped) package",
 	"homepage": "http://bcherny.github.io/draggable/demos",
 	"author": "Boris Cherny <boris@performancejs.com>",
+	"main": "dist/draggable.min.js",
 	"contributors": [
 		{
 			"name": "Boris Cherny",
