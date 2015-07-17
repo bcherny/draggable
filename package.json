@@ -1,28 +1,36 @@
 {
-	"name": "draggable",
-	"version": "2.1.1",
-	"description": "High performance, fully cross browser, full featured drag and drop in a tiny (2k gzipped) package",
-	"homepage": "http://bcherny.github.io/draggable/demos",
-	"author": "Boris Cherny <boris@performancejs.com>",
-	"main": "dist/draggable.min.js",
-	"contributors": [
-		{
-			"name": "Boris Cherny",
-			"email": "boris@performancejs.com"
-		}
-	],
-	"devDependencies": {
-		"grunt": "~0.4.1",
-		"grunt-contrib-uglify": "~0.2.4",
-		"grunt-contrib": "~0.7.0",
-		"grunt-contrib-concat": "~0.3.0"
-	},
-	"license": "MIT",
-	"readmeFilename": "README.md",
-	"dependencies": {},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/bcherny/draggable.git"
-	},
-	"keywords": ["drag", "drop", "drag and drop", "dragndrop", "move"]
+  "name": "draggable",
+  "version": "2.1.2",
+  "description": "High performance, fully cross browser, full featured drag and drop in a tiny (2k gzipped) package",
+  "homepage": "http://bcherny.github.io/draggable/demos",
+  "author": "Boris Cherny <boris@performancejs.com>",
+  "main": "dist/draggable.min.js",
+  "contributors": [
+    {
+      "name": "Boris Cherny",
+      "email": "boris@performancejs.com"
+    }
+  ],
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-uglify": "~0.2.4",
+    "grunt-contrib": "~0.7.0",
+    "grunt-contrib-concat": "~0.3.0"
+  },
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "dependencies": {
+    "jquery": "^2.1.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bcherny/draggable.git"
+  },
+  "keywords": [
+    "drag",
+    "drop",
+    "drag and drop",
+    "dragndrop",
+    "move"
+  ]
 }
