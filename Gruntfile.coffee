@@ -14,12 +14,6 @@ module.exports = (grunt) ->
 			standard:
 				files:
 					'dist/draggable.min.js': [
-						'src/jQueryShim.js',
-						'src/draggable.js'
-					]
-			no$:
-				files:
-					'dist/draggable.no$.min.js': [
 						'src/draggable.js'
 					]
 		#wrap: true
@@ -28,4 +22,3 @@ module.exports = (grunt) ->
 	grunt.loadNpmTasks 'grunt-contrib-uglify'
 
 	grunt.registerTask 'default', ['uglify']
-	grunt.registerTask 'no$', ['uglify:no$']

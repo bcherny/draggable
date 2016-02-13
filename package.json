@@ -1,7 +1,7 @@
 {
   "name": "draggable",
-  "version": "3.0.0",
-  "description": "High performance, fully cross browser, full featured drag and drop in a tiny (2k gzipped) package",
+  "version": "4.0.0",
+  "description": "High performance, fully cross browser, full featured drag and drop in a tiny (2k gzipped), dependency-free package",
   "homepage": "http://bcherny.github.io/draggable/demos",
   "author": "Boris Cherny <boris@performancejs.com>",
   "main": "dist/draggable.min.js",
@@ -23,7 +23,6 @@
   "license": "MIT",
   "readmeFilename": "README.md",
   "dependencies": {
-    "jquery": "^2.1.4"
   },
   "repository": {
     "type": "git",

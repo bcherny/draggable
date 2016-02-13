@@ -1,17 +1,12 @@
 (function (root, factory) {
     if (typeof exports === 'object') {
-        // Node. Does not work with strict CommonJS, but
-        // only CommonJS-like enviroments that support module.exports,
-        // like Node.
-        module.exports = factory(require('jquery'));
+      module.exports = factory();
     } else if (typeof define === 'function' && define.amd) {
-        // AMD. Register as an anonymous module.
-        define(['jquery'], factory);
+      define([], factory);
     } else {
-        // Browser globals (root is window)
-        root.Draggable = factory(root.jQuery);
+      root.Draggable = factory();
     }
-}(this, function ($) {
+}(this, function () {
 
   'use strict';
 
@@ -64,7 +59,59 @@
 
   };
 
-  var $document = $(document);
+  var util = {
+
+    assign: function () {
+
+      var obj = arguments[0];
+      var count = arguments.length;
+
+      for ( var n = 1; n < count; n++ ) {
+        var argument = arguments[n];
+        for ( var key in argument ) {
+          obj[key] = argument[key];
+        }
+      }
+
+      return obj;
+
+    },
+
+    bind: function (fn, context) {
+      return function() {
+        fn.apply(context, arguments);
+      }
+    },
+
+    on: function (element, e, fn) {
+      if (e && fn) {
+        util.addEvent (element, e, fn);
+      } else if (e) {
+        for (var ee in e) {
+          util.addEvent (element, ee, e[ee]);
+        }
+      }
+    },
+
+    off: function (element, e, fn) {
+      if (e && fn) {
+        util.removeEvent (element, e, fn);
+      } else if (e) {
+        for (var ee in e) {
+          util.removeEvent (element, ee, e[ee]);
+        }
+      }
+    },
+
+    addEvent: env.ie
+      ? function (element, e, fn) { element.attachEvent('on'+e, fn) }
+      : function (element, e, fn) { element.addEventListener(e, fn, false) },
+
+    removeEvent: env.ie
+      ? function (element, e, fn) { element.detachEvent('on'+e, fn) }
+      : function (element, e, fn) { element.removeEventListener(e, fn) }
+
+  };
 
   /*
     usage:
@@ -77,9 +124,9 @@
   function Draggable (element, options) {
 
     var me = this,
-      start = bind(me.start, me),
-      drag = bind(me.drag, me),
-      stop = bind(me.stop, me);
+      start = util.bind(me.start, me),
+      drag = util.bind(me.drag, me),
+      stop = util.bind(me.stop, me);
 
     // sanity check
     if (!isElement(element)) {
@@ -87,11 +134,10 @@
     }
 
     // set instance properties
-    $.extend(me, {
+    util.assign(me, {
 
       // DOM element
       element: element,
-      $element: $(element),
 
       // DOM event handlers
       handlers: {
@@ -107,7 +153,7 @@
       },
 
       // options
-      options: $.extend({}, defaults, options)
+      options: util.assign({}, defaults, options)
 
     });
 
@@ -116,7 +162,7 @@
 
   }
 
-  $.extend (Draggable.prototype, {
+  util.assign (Draggable.prototype, {
 
     // public
 
@@ -219,13 +265,13 @@
       me.setLimit(options.limit);
 
       // set position in model
-      $.extend(me.dragEvent, {
+      util.assign(me.dragEvent, {
         x: _dimensions.left,
         y: _dimensions.top
       });
 
       // attach mousedown event
-      me.$element.on(me.handlers.start);
+      util.on(me.element, me.handlers.start);
 
     },
 
@@ -257,7 +303,7 @@
       me.setZoom();
 
       // add event listeners
-      $document.on(me.handlers.move);
+      util.on(document, me.handlers.move);
 
     },
 
@@ -342,7 +388,7 @@
         pos;
 
       // remove event listeners
-      $document.off(me.handlers.move);
+      util.off(document, me.handlers.move);
 
       // resent element's z-index
       element.style.zIndex = dragEvent.oldZindex;
@@ -351,7 +397,7 @@
       if (options.smoothDrag && grid) {
         pos = me.round({ x: dragEvent.x, y: dragEvent.y }, grid);
         me.move(pos.x, pos.y);
-        $.extend(me.dragEvent, pos);
+        util.assign(me.dragEvent, pos);
       }
 
       // trigger dragend event
@@ -639,7 +685,7 @@
         element = me.element,
         style = element.style;
 
-      $.extend(me._dimensions, {
+      util.assign(me._dimensions, {
         left: parse(style.left) || element.offsetLeft,
         top: parse(style.top) || element.offsetTop
       });
@@ -681,20 +727,14 @@
 
     destroy: function () {
 
-      this.$element.off(this.handlers.start);
-      $document.off(this.handlers.move);
+      util.off(this.element, this.handlers.start);
+      util.off(document, this.handlers.move);
 
     }
 
   });
 
   // helpers
-
-  function bind (fn, context) {
-    return function() {
-      fn.apply(context, arguments);
-    }
-  }
 
   function parse (string) {
     return parseInt(string, 10);

@@ -3,18 +3,14 @@ var elements = document.getElementsByClassName('ball'),
 	labelsX = document.getElementsByClassName('coords-x'),
 	labelsY = document.getElementsByClassName('coords-y');
 
-// options for each drag instance
-var options = {
-	setCursor: true
-};
-
 // loop over the 3 balls...
 for (var n = elements.length; n--;) {
 
 	// ... augment our default options with individual `onDrag` handlers
-	var opts = jQuery.extend(options, {
-		onDrag: onDragFactory(n)
-	});
+	var opts = {
+		onDrag: onDragFactory(n),
+		setCursor: true
+	};
 
 	// ... and initialize drag for each
 	window.d = new Draggable(elements[n], opts);
