@@ -1,6 +1,6 @@
 {
   "name": "draggable",
-  "version": "2.1.2",
+  "version": "3.0.0",
   "description": "High performance, fully cross browser, full featured drag and drop in a tiny (2k gzipped) package",
   "homepage": "http://bcherny.github.io/draggable/demos",
   "author": "Boris Cherny <boris@performancejs.com>",
@@ -11,6 +11,9 @@
       "email": "boris@performancejs.com"
     }
   ],
+  "scripts": {
+    "build": "grunt"
+  },
   "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-contrib-uglify": "~0.2.4",
