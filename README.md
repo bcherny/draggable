@@ -1,6 +1,6 @@
 #draggable
 
-High performance, cross browser, full featured drag and drop in a tiny (2k gzipped) package.
+High performance, fully cross browser, full featured drag and drop in a tiny (2k gzipped), dependency-free package.
 
 ## Demo
 
@@ -34,7 +34,7 @@ new Draggable (element);
 
 ## Dependencies
 
-- **jQuery** or a $-namespaced shim for .on, .off, and .extend (included in the packaged version)
+None!
 
 ## Options
 
