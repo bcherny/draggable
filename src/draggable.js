@@ -36,12 +36,6 @@
 
   var env = {
 
-    // touch support flag
-    touch: ('ontouchstart' in window) || ('DocumentTouch' in window && document instanceof DocumentTouch),
-
-    // internet explorer flag
-    ie: navigator.appName === 'Microsoft Internet Explorer',
-
     // CSS vendor-prefixed transform property
     transform: (function(){
 
@@ -103,11 +97,11 @@
       }
     },
 
-    addEvent: env.ie
+    addEvent: ('attachEvent' in Element.prototype)
       ? function (element, e, fn) { element.attachEvent('on'+e, fn) }
       : function (element, e, fn) { element.addEventListener(e, fn, false) },
 
-    removeEvent: env.ie
+    removeEvent: ('attachEvent' in Element.prototype)
       ? function (element, e, fn) { element.detachEvent('on'+e, fn) }
       : function (element, e, fn) { element.removeEventListener(e, fn) }
 
@@ -141,15 +135,16 @@
 
       // DOM event handlers
       handlers: {
-
-        start: env.touch
-          ? { touchstart: start }
-          : { mousedown: start },
-
-        move: env.touch
-          ? { touchmove: drag, touchend: stop }
-          : { mousemove: drag, mouseup: stop }
-
+        start: {
+          mousedown: start,
+          touchstart: start
+        },
+        move: {
+          mousemove: drag,
+          mouseup: stop,
+          touchmove: drag,
+          touchend: stop
+        }
       },
 
       // options
@@ -430,8 +425,8 @@
     getCursor: function (e) {
 
       return {
-        x: (env.touch ? e.targetTouches[0] : e).clientX,
-        y: (env.touch ? e.targetTouches[0] : e).clientY
+        x: (e.targetTouches ? e.targetTouches[0] : e).clientX,
+        y: (e.targetTouches ? e.targetTouches[0] : e).clientY
       };
 
     },
@@ -741,7 +736,7 @@
   }
 
   function getStyle (element) {
-    return env.ie ? element.currentStyle : getComputedStyle(element);
+    return 'currentStyle' in element ? element.currentStyle : getComputedStyle(element);
   }
 
   function isArray (thing) {
