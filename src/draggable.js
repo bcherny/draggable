@@ -97,6 +97,23 @@
       }
     },
 
+    // Example:
+    //
+    //     util.limit(x, limit.x)
+    limit: function (n, limit) {
+      // {Array} limit.x
+      if (isArray(limit)) {
+        limit = [+limit[0], +limit[1]];
+        if (n < limit[0]) n = limit[0];
+        else if (n > limit[1]) n = limit[1];
+      // {Number} limit.x
+      } else {
+        n = +limit;
+      }
+
+      return n;
+    },
+
     addEvent: ('attachEvent' in Element.prototype)
       ? function (element, e, fn) { element.attachEvent('on'+e, fn) }
       : function (element, e, fn) { element.addEventListener(e, fn, false) },
@@ -242,7 +259,7 @@
       }
 
       // optional styling
-      
+
       if (options.setPosition) {
         style.display = 'block';
         style.left = _dimensions.left + 'px';
@@ -459,16 +476,9 @@
           width = limit.scrollWidth - draggableSize.width;
 
         me.limit = function (x, y) {
-
-          if (x < 0) x = 0;
-          else if (x > width) x = width;
-
-          if (y < 0) y = 0;
-          else if (y > height) y = height;
-
           return {
-            x: x,
-            y: y
+            x: util.limit(x, [0, width]),
+            y: util.limit(y, [0, height])
           }
         };
 
@@ -488,180 +498,15 @@
 
           me.limit = _true;
 
-        }
-
-        // {Undefined} limit.y
-        else if (defined.x && !defined.y) {
-
-          // {Array} limit.x, {Undefined} limit.y
-          if (isArray(limit.x)) {
-
-            _x = [
-              +limit.x[0],
-              +limit.x[1]
-            ];
-
-            me.limit = function (x, y) {
-
-              if (x < _x[0]) x = _x[0];
-              else if (x > _x[1]) x = _x[1];
-
-              return {
-                x: x,
-                y: y
-              };
-
-            };
-
-          }
-
-          // {Number} limit.x, {Undefined} limit.y
-          else {
-
-            _x = +limit.x;
-
-            me.limit = function (x, y) {
-              return {
-                x: _x,
-                y: y
-              };
-            };
-
-          }
-
-        }
-
-        // {Undefined} limit.x
-        else if (!defined.x && defined.y) {
-
-          // {Undefined} limit.x, {Array} limit.y
-          if (isArray(limit.y)) {
-
-            _y = [
-              +limit.y[0],
-              +limit.y[1]
-            ];
-
-            me.limit = function (x, y) {
-
-              if (y < _y[0]) y = _y[0];
-              else if (y > _y[1]) y = _y[1];
-
-              return {
-                x: x,
-                y: y
-              };
-
-            };
-
-          }
-
-          // {Undefined} limit.x, {Number} limit.y
-          else {
-
-            _y = +limit.y;
-
-            me.limit = function (x, y) {
-              return {
-                x: x,
-                y: _y
-              };
-            };
-
-          }
-
         } else {
 
-          // {Array} limit.x, {Array} limit.y
-          if (isArray(limit.x) && isArray(limit.y)) {
-
-            _x = [
-              +limit.x[0],
-              +limit.x[1]
-            ];
-            _y = [
-              +limit.y[0],
-              +limit.y[1]
-            ];
-
-            me.limit = function (x, y) {
-
-              if (x < _x[0]) x = _x[0];
-              else if (x > _x[1]) x = _x[1];
-
-              if (y < _y[0]) y = _y[0];
-              else if (y > _y[1]) y = _y[1];
-
-              return {
-                x: x,
-                y: y
-              };
-
+          me.limit = function (x, y) {
+            return {
+              x: defined.x ? util.limit(x, limit.x) : x,
+              y: defined.y ? util.limit(y, limit.y) : y
             };
+          };
 
-          }
-
-          // {Array} limit.x, {Number} limit.y
-          else if (isArray(limit.x)) {
-
-            _x = [
-              +limit.x[0],
-              +limit.x[1]
-            ];
-            _y = +limit.y;
-
-            me.limit = function (x, y) {
-
-              if (x < _x[0]) x = _x[0];
-              else if (x > _x[1]) x = _x[1];
-
-              return {
-                x: x,
-                y: _y
-              };
-
-            };
-
-          }
-
-          // {Number} limit.x, {Array} limit.y
-          else if (isArray(limit.y)) {
-
-            _x = +limit.x;
-            _y = [
-              +limit.y[0],
-              +limit.y[1]
-            ];
-
-            me.limit = function (x, y) {
-
-              if (y < _y[0]) y = _y[0];
-              else if (y > _y[1]) y = _y[1];
-
-              return {
-                x: _x,
-                y: y
-              };
-
-            };
-
-          }
-
-          // {Number} limit.x, {Number} limit.y
-          else {
-
-            _x = +limit.x;
-            _y = +limit.y;
-
-            me.limit = function (x, y) {
-
-              return {
-                x: _x,
-                y: _y
-              };
-
-            };
-          }
         }
       }
 
