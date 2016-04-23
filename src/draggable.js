@@ -294,7 +294,7 @@
       var element = me.element;
 
       // filter the target?
-      if (!me.useTarget(e.target)) {
+      if (!me.useTarget(e.target || e.srcElement)) {
         return;
       }
 
