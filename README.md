@@ -41,6 +41,7 @@ None!
 | Option            | Type                | Default | Description                                                           |
 |-------------------|---------------------|---------|-----------------------------------------------------------------------|
 | **grid**          | `Number`            | `0`     | grid size for snapping on drag                                        |
+| **handle**        | `element`           | `null`  | the handle of the draggable. If null, the whole element is the handle. |
 | **filterTarget**  | `Function(target)`  | `null`  | prevent drag when target passes this test                             |
 | **limit**         | `Element`, `Function(x, y, x0, y0)`, or `Object` | `{ x: null, y: null }` | limit x/y drag bounds     |
 | **threshold**     | `Number`            | `0`     | threshold before drag begins (in px)                                  |
@@ -102,7 +103,7 @@ limit: function (
   x0, // original X coordinate (where drag was started)
   y0  // original Y coordinate (where drag was started)
 ) {
-  
+
   var radius = 100,
     dx = x - x0,
     dy = y - y0,
@@ -111,14 +112,14 @@ limit: function (
     // only allow dragging within a circle of radius 100
     outOfRange = distance > radius;
 
-  
+
   // if our point is outside of the circle, compute the
   // point on the circle's edge closest to our point
   if (outOfRange) {
 
     x = x0 + radius * (x - x0) / distance;
     y = y0 + radius * (y - y0) / distance;
-    
+
   }
 
   return {
