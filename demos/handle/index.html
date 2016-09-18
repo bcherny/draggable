@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+	<title>handle element demo | draggable.js</title>
+
+	<meta name="viewport" content="user-scalable=no, width=device-width, minimum-scale=1, maximum-scale=1" />
+
+	<link rel="stylesheet" href="../__common/common.css" />
+
+</head>
+<body>
+
+	<ul id="nav">
+		<li><a class="cur" href="#">Basic</a></li>
+		<li><a href="../bounded">Bounded</a></li>
+		<li><a href="../boundedcustom">Bounded (custom)</a></li>
+		<li><a href="../grid">Grid</a></li>
+	</ul>
+
+	<div id="container">
+		<div class="ball has-handle red"><p>&#9995;</p></div>
+		<div class="ball has-handle green"><p>&#9995;</p></div>
+		<div class="ball has-handle blue"><p>&#9995;</p></div>
+	</div>
+	<div id="info">
+		<div class="column">
+			<h1>1</h1>
+			<span class="coords-x"></span>
+			<span class="coords-y"></span>
+		</div>
+		<div class="column">
+			<h1>2</h1>
+			<span class="coords-x"></span>
+			<span class="coords-y"></span>
+		</div>
+		<div class="column">
+			<h1>3</h1>
+			<span class="coords-x"></span>
+			<span class="coords-y"></span>
+		</div>
+	</div>
+
+	<script src="../../src/draggable.js"></script>
+	<script src="../__common/common.js"></script>
+
+	<!-- this is the script you're looking for... -->
+	<script src="handle.js"></script>
+
+</body>
+</html>
