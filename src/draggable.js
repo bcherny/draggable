@@ -40,17 +40,17 @@
     transform: (function(){
 
       if (!document || !document.body) {
+        return;
+      }
 
-        var prefixes = ' -o- -ms- -moz- -webkit-'.split(' ');
-        var style = document.body.style;
+      var prefixes = ' -o- -ms- -moz- -webkit-'.split(' ');
+      var style = document.body.style;
 
-        for (var n = prefixes.length; n--;) {
-          var property = prefixes[n] + 'transform';
-          if (property in style) {
-            return property;
-          }
+      for (var n = prefixes.length; n--;) {
+        var property = prefixes[n] + 'transform';
+        if (property in style) {
+          return property;
         }
-
       }
 
     })()
