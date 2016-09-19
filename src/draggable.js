@@ -1,4 +1,8 @@
 (function (root, factory) {
+	if (typeof window === 'undefined') {
+		return
+	}
+
     if (typeof exports === 'object') {
       module.exports = factory();
     } else if (typeof define === 'function' && define.amd) {
