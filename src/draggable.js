@@ -571,7 +571,7 @@
 
     destroy: function () {
 
-      util.off(this.element, this.handlers.start);
+      util.off(this.handle, this.handlers.start);
       util.off(document, this.handlers.move);
 
     }
