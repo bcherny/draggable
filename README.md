@@ -41,7 +41,7 @@ None!
 | Option            | Type                | Default | Description                                                           |
 |-------------------|---------------------|---------|-----------------------------------------------------------------------|
 | **grid**          | `Number`            | `0`     | grid size for snapping on drag                                        |
-| **handle**        | `element`           | `null`  | the handle of the draggable. If null, the whole element is the handle. |
+| **handle**        | `Element`           | `null`  | the handle of the draggable; if null, the whole element is the handle |
 | **filterTarget**  | `Function(target)`  | `null`  | prevent drag when target passes this test                             |
 | **limit**         | `Element`, `Function(x, y, x0, y0)`, or `Object` | `{ x: null, y: null }` | limit x/y drag bounds     |
 | **threshold**     | `Number`            | `0`     | threshold before drag begins (in px)                                  |
