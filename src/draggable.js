@@ -149,6 +149,9 @@
 
       // DOM element
       element: element,
+      handle: (options.handle && isElement(options.handle))
+              ? options.handle
+              : element,
 
       // DOM event handlers
       handlers: {
@@ -228,6 +231,7 @@
 
       var me = this,
         element = me.element,
+        handle = me.handle,
         style = element.style,
         compStyle = getStyle(element),
         options = me.options,
@@ -283,7 +287,7 @@
       });
 
       // attach mousedown event
-      util.on(me.element, me.handlers.start);
+      util.on(me.handle, me.handlers.start);
 
     },
 
@@ -567,7 +571,7 @@
 
     destroy: function () {
 
-      util.off(this.element, this.handlers.start);
+      util.off(this.handle, this.handlers.start);
       util.off(document, this.handlers.move);
 
     }

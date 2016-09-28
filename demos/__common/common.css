@@ -61,6 +61,25 @@ body {
 	width: 100px;
 }
 
+.ball p {
+	display: block;
+	background: white;
+	border-radius: 50%;
+	cursor: move;
+	width: 30px;
+	height: 30px;
+	line-height: 39px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	font-size: 22px;
+	margin: -15px 0 0 -15px;
+}
+
+.ball.has-handle {
+	cursor: default !important;
+}
+
 .red { background: red }
 .green { background: green }
 .blue { background: blue }
