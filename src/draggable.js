@@ -144,6 +144,8 @@
       throw new TypeError('Draggable expects argument 0 to be an Element');
     }
 
+    options = util.assign({}, defaults, options);
+
     // set instance properties
     util.assign(me, {
 
@@ -168,7 +170,7 @@
       },
 
       // options
-      options: util.assign({}, defaults, options)
+      options: options
 
     });
 
