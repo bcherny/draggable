@@ -599,7 +599,7 @@
   }
 
   function isElement (thing) {
-    return thing instanceof Element || thing instanceof HTMLDocument;
+    return thing instanceof Element || typeof HTMLDocument !== 'undefined' && thing instanceof HTMLDocument;
   }
 
   function isFunction (thing) {
