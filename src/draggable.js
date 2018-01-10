@@ -305,9 +305,9 @@
       }
 
       // prevent browsers from visually dragging the element's outline
-      if (e.preventDefault) {
+      if (e.preventDefault && !e.target.getAttribute('contenteditable')) {
         e.preventDefault();
-      } else {
+      } else if (!e.target.getAttribute('contenteditable')) {
         e.returnValue = false; // IE10
       }
 
