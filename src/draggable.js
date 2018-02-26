@@ -270,6 +270,8 @@
         style.display = 'block';
         style.left = _dimensions.left + 'px';
         style.top = _dimensions.top + 'px';
+        style.width = _dimensions.width + 'px';
+        style.height = _dimensions.height + 'px';
         style.bottom = style.right = 'auto';
         style.margin = 0;
         style.position = 'absolute';
