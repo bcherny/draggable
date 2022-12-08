@@ -148,7 +148,11 @@
 
     // set instance properties
     util.assign(me, {
-
+      dragEvent: {
+        started: false,
+        x: 0,
+        y: 0,
+      },
       // DOM element
       element: element,
       handle: (options.handle && isElement(options.handle))
